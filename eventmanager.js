@@ -4,7 +4,7 @@
 //     Publish
 // lets go ahead and define these thre functions
 
-class MyClass {
+class Subject {
 
     // (5) We need someway to keep track of our subscribers and we can do that with
     // a variable. 
@@ -33,6 +33,22 @@ class MyClass {
         }
     }
 
+    // Other way a little diferent than the first above, more directly
+    subscribe1(type, fn) {
+        //let subscribers = this.subscribers;
+        // (6) We first want to check to see if we have a property with our type parameter
+        // that's means if we do not have that property then we simply want to create it
+        if (!this.subscribers[type]) {
+            this.subscribers[type] = [];
+        }
+        // (7) Now we want to add the function to this array, but only if the function does not
+        // already exist within the array
+        // we can use the indexof method to determine if we already have that function object
+        if (this.subscribers[type].indexOf(fn) === -1) {
+            this.subscribers[type].push(fn);
+        }
+    }
+
     // (2) We need the unsubscribe method as well. And in this function we need the same info
     unsubscribe(type, fn) {
         // (8) We will first check to see if we have a property with our type, if we dont then just 
@@ -53,6 +69,24 @@ class MyClass {
         if (index > -1 ) {
             listeners.splice(index, 1);
         } 
+    }
+
+    // Better than 'unsubscribe' 
+    unsubscribe1(type, fn) {
+        let listeners = this.subscribers[type];
+        if (!listeners) {
+            return;
+        } 
+        listeners = listeners.filter(element => element !== fn);
+        this.subscribers[type] = listeners;    
+    }
+
+    // Better than 'unsubscribe1'
+    unsubscribe2(type, fn) {
+        if ( !this.subscribers[type] ) {
+            return;
+        } 
+        this.subscribers[type] = this.subscribers[type].filter(element => element !== fn);
     }
 
     // (3) and finally we need a function to publish. First of all we need to know the type 
@@ -92,4 +126,22 @@ class MyClass {
     //     unsubscribe: unsubscribe,
     //     pubish: publish
     // };
+
+
+    publish1(type, evtObj) {
+        if ( !this.subscribers[type] ) {
+            return;
+        }
+        this.subscribers[type].filter(element => element(evtObj) );
+    }
+
+
+    publish2(type, evtObj) {
+        if ( !this.subscribers[type] ) {
+            return;
+        }
+        for (let i = 0; i < this.subscribers[type].length ; i++) {
+            this.subscribers[type][i](evtObj);
+        }
+    }
 };
